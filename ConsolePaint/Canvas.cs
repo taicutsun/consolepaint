@@ -1,49 +1,91 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace ConsolePaint;
 
-namespace ConsolePaint
+public class Canvas
 {
-    class Canvas(int width, int height)
+    private int width;
+    private int height;
+    private Pixel[,] pixels;
+
+    public Canvas(int width, int height)
     {
-        private readonly char[,] grid = new char[height, width];
+        this.width = width;
+        this.height = height;
+        pixels = new Pixel[width, height]; 
+    }
 
-        public void Clear()
+    public void Draw(Shape shape)
+    {
+        foreach (var pixel in shape.OuterPixels)
         {
-            for (int i = 0; i < height; i++)
+            SetPixel(pixel.X, pixel.Y, pixel.Symbol, pixel.Color);
+        }
+
+        foreach (var pixel in shape.InnerPixels)
+        {
+            SetPixel(pixel.X, pixel.Y, pixel.Symbol, pixel.Color);
+        }
+    }
+
+    public void DrawFrame()
+    {
+        Console.SetCursorPosition(0, 4);
+        Console.Write("  ");  
+        for (int i = 0; i < width; i++)
+        {
+            Console.Write($"{i % 10}");  
+        }
+        Console.WriteLine();
+        
+        for (int y = 0; y < height; y++)
+        {
+            Console.SetCursorPosition(0, y + 5); 
+            Console.Write($"{y % 10} ");
+            for (int x = 0; x < width; x++)
             {
-                for (int j = 0; j < width; j++)
-                {
-                    grid[i, j] = ' ';
-                }
+                Console.Write(" "); 
             }
         }
 
-        public void Display()
+        Console.SetCursorPosition(0, height + 5);
+        Console.Write("  ");
+        for (int i = 0; i < width; i++)
         {
-            for (int i = 0; i < height; i++)
-            {
-                for (int j = 0; j < width; j++)
-                {
-                    Console.Write(grid[i, j]);
-                }
-                Console.WriteLine();
-            }
+            Console.Write($"{i % 10}"); 
         }
+        Console.WriteLine();
+    }
 
-        public void Draw(Shape shape)
+    public void DrawShapes(List<Shape> shapes)
+    {
+        foreach (var shape in shapes)
         {
-            shape.Draw(this);
+            Draw(shape); 
         }
-
-        public void SetPixel(int x, int y, char symbol)
+    }
+    
+    private void SetPixel(int x, int y, char symbol, ConsoleColor color)
+    {
+        if (x >= 0 && x < width && y >= 0 && y < height)
         {
-            if (x >= 0 && x < width && y >= 0 && y < height)
+            pixels[x, y] = new Pixel(x, y, symbol, color);
+            Console.SetCursorPosition(x + 1, y + 5); 
+            Console.ForegroundColor = color;
+            Console.Write(symbol);
+        }
+    }
+
+    // Очистка холста
+    public void Clear()
+    {
+        for (int i = 0; i < width; i++)
+        {
+            for (int j = 0; j < height; j++)
             {
-                grid[y, x] = symbol;
+                pixels[i, j] = new Pixel(i, j, ' ', ConsoleColor.Black);  // Инициализация пустыми пикселями
+                Console.SetCursorPosition(i + 1, j + 5);  // Смещаем на 1, чтобы не затереть границу
+                Console.Write(' ');
             }
         }
     }
 }
+

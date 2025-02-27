@@ -1,10 +1,28 @@
 ﻿namespace ConsolePaint.Shapes
 {
-    class Point(int x, int y, char symbol) : Shape
+    public class Point : Shape
     {
-        public override void Draw(Canvas canvas)
+        private int x, y;
+        private char symbol;
+        private ConsoleColor color;
+
+        public Point(int x, int y, char symbol, ConsoleColor color)
+            : base()
         {
-            canvas.SetPixel(x, y, symbol);
+            this.x = x;
+            this.y = y;
+            this.symbol = symbol;
+            this.color = color;
+            CalculatePixels();  
+        }
+        
+        public override void CalculatePixels()
+        {
+          
+            OuterPixels.Clear();
+            InnerPixels.Clear(); 
+            
+            OuterPixels.Add(new Pixel(x, y, symbol, color));
         }
     }
 }
