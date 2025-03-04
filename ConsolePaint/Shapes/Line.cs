@@ -15,13 +15,15 @@
             this.y2 = y2;
             this.symbol = symbol;
             this.color = color;
-            CalculatePixels();
+            CalculatePixels();  // Изначально рассчитываем пиксели
         }
-        
-        public override void CalculatePixels()
+
+        // Метод для вычисления пикселей линии
+        protected override void CalculatePixels()
         {
+            // Очищаем старые пиксели
             OuterPixels.Clear();
-            InnerPixels.Clear();
+            InnerPixels.Clear(); // Для линии внутренних пикселей нет
 
             int dx = Math.Abs(x2 - x1);
             int dy = Math.Abs(y2 - y1);
@@ -31,7 +33,7 @@
 
             while (true)
             {
-                OuterPixels.Add(new Pixel(x1, y1, symbol, color)); 
+                OuterPixels.Add(new Pixel(x1, y1, symbol, color));  // Добавляем пиксель на контур линии
 
                 if (x1 == x2 && y1 == y2) break;
 

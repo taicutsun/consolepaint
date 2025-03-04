@@ -13,15 +13,17 @@
             this.y = y;
             this.symbol = symbol;
             this.color = color;
-            CalculatePixels();  
+            CalculatePixels();  // Изначально рассчитываем пиксели
         }
-        
-        public override void CalculatePixels()
+
+        // Метод для вычисления пикселей точки
+        protected override void CalculatePixels()
         {
-          
+            // Очищаем старые пиксели
             OuterPixels.Clear();
-            InnerPixels.Clear(); 
-            
+            InnerPixels.Clear();  // Для точки внутренних пикселей нет
+
+            // Добавляем пиксель для точки
             OuterPixels.Add(new Pixel(x, y, symbol, color));
         }
     }

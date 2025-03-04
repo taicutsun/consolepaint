@@ -15,31 +15,35 @@
             this.y2 = y2;
             this.symbol = symbol;
             this.color = color;
-            CalculatePixels(); 
+            CalculatePixels();  // Изначально рассчитываем пиксели
         }
-        public override void CalculatePixels()
+
+        // Метод для вычисления пикселей прямоугольника
+        protected override void CalculatePixels()
         {
+            // Очищаем старые пиксели
             OuterPixels.Clear();
             InnerPixels.Clear();
 
+            // Внешние пиксели (границы прямоугольника)
             for (int x = x1; x <= x2; x++)
             {
-                OuterPixels.Add(new Pixel(x, y1, symbol, color)); 
-                OuterPixels.Add(new Pixel(x, y2, symbol, color)); 
+                OuterPixels.Add(new Pixel(x, y1, symbol, color)); // Верхняя граница
+                OuterPixels.Add(new Pixel(x, y2, symbol, color)); // Нижняя граница
             }
 
             for (int y = y1; y <= y2; y++)
             {
-                OuterPixels.Add(new Pixel(x1, y, symbol, color));
-                OuterPixels.Add(new Pixel(x2, y, symbol, color)); 
+                OuterPixels.Add(new Pixel(x1, y, symbol, color)); // Левая граница
+                OuterPixels.Add(new Pixel(x2, y, symbol, color)); // Правая граница
             }
 
-           
+            // Внутренние пиксели (внутри прямоугольника)
             for (int x = x1 + 1; x < x2; x++)
             {
                 for (int y = y1 + 1; y < y2; y++)
                 {
-                    InnerPixels.Add(new Pixel(x, y, symbol, color));
+                    InnerPixels.Add(new Pixel(x, y, ' ', color)); // Внутренние пиксели
                 }
             }
         }
