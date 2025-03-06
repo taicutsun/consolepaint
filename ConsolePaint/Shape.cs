@@ -1,55 +1,60 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace ConsolePaint
+﻿namespace ConsolePaint
 {
     public abstract class Shape
     {
-        public int Id { get; }  // Уникальный идентификатор для каждой фигуры
-        private static int idCounter = 0;   // Счётчик для генерации ID
-        public List<Pixel> OuterPixels { get; private set; }
-        public List<Pixel> InnerPixels { get; private set; }
+        private static int idCounter = 0;
+        public int Id { get; set; }
+
+        public char Symbol { get; set; }
+        public ConsoleColor Color { get; set; }
+
+        public List<Pixel> OuterPixels { get; set; }
+        public List<Pixel> InnerPixels { get; set; }
 
         public Shape()
         {
             Id = idCounter++;
-            OuterPixels = [];  // Инициализация списка
-            InnerPixels = [];  // Инициализация списка
+            OuterPixels = [];
+            InnerPixels = [];
+            Symbol = ' ';              
+            Color = ConsoleColor.White;
         }
 
-        // Метод для вычисления пикселей фигуры (сделаем его публичным)
+        protected Shape(char symbol, ConsoleColor color)
+        {
+            Id = idCounter++;
+            OuterPixels = [];
+            InnerPixels = [];
+            Symbol = symbol;
+            Color = color;
+        }
+
+
         protected abstract void CalculatePixels();
 
-        /// <summary>
-        /// Перемещает фигуру на (dx, dy): для каждого пикселя в списках прибавляет dx и dy,
-        /// затем вызывает CalculatePixels() для пересчёта.
-        /// </summary>
         public virtual void Move(int dx, int dy)
         {
-            for (int i = 0; i < OuterPixels.Count; i++)
+            foreach (var t in OuterPixels)
             {
-                OuterPixels[i].X += dx;
-                OuterPixels[i].Y += dy;
+                t.X += dx;
+                t.Y += dy;
             }
-            for (int i = 0; i < InnerPixels.Count; i++)
+
+            foreach (var t in InnerPixels)
             {
-                InnerPixels[i].X += dx;
-                InnerPixels[i].Y += dy;
+                t.X += dx;
+                t.Y += dy;
             }
-            // CalculatePixels();
         }
 
-        /// <summary>
-        /// Проверяет, содержит ли фигура точку (x, y) в своих пикселях.
-        /// </summary>
         public virtual bool ContainsPoint(int x, int y)
         {
-            foreach (Pixel p in OuterPixels)
+            foreach (var p in OuterPixels)
             {
                 if (p.X == x && p.Y == y)
                     return true;
             }
-            foreach (Pixel p in InnerPixels)
+            foreach (var p in InnerPixels)
             {
                 if (p.X == x && p.Y == y)
                     return true;
