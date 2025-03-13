@@ -20,11 +20,11 @@
             OuterPixels.Clear();
             InnerPixels.Clear();
 
-            var dx = Math.Abs(x2 - x1);
-            var dy = Math.Abs(y2 - y1);
-            var sx = (x1 < x2) ? 1 : -1;
-            var sy = (y1 < y2) ? 1 : -1;
-            var err = dx - dy;
+            int dx = Math.Abs(x2 - x1);
+            int dy = Math.Abs(y2 - y1);
+            int sx = (x1 < x2) ? 1 : -1;
+            int sy = (y1 < y2) ? 1 : -1;
+            int err = dx - dy;
 
             while (true)
             {
@@ -32,17 +32,17 @@
 
                 if (x1 == x2 && y1 == y2) break;
 
-                var e2 = err * 2;
+                int e2 = err * 2;
                 if (e2 > -dy)
                 {
                     err -= dy;
                     x1 += sx;
                 }
-
-                if (e2 >= dx) continue;
-                
-                err += dx;
-                y1 += sy;
+                if (e2 < dx)
+                {
+                    err += dx;
+                    y1 += sy;
+                }
             }
         }
     }

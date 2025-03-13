@@ -1,4 +1,5 @@
-﻿using ConsolePaint.Commands;
+﻿using System.Collections.Generic;
+using ConsolePaint.Commands;
 
 namespace ConsolePaint.Services
 {
@@ -7,6 +8,9 @@ namespace ConsolePaint.Services
         private readonly Stack<IUndoableAction> undoStack = new();
         private readonly Stack<IUndoableAction> redoStack = new();
 
+        /// <summary>
+        /// Выполняет действие, сохраняет его в стек undo и очищает стек redo.
+        /// </summary>
         public void ExecuteAction(IUndoableAction action)
         {
             action.Execute();
@@ -14,22 +18,30 @@ namespace ConsolePaint.Services
             redoStack.Clear();
         }
 
+        /// <summary>
+        /// Отменяет последнее действие.
+        /// </summary>
         public void Undo()
         {
-            if (undoStack.Count <= 0) return;
-            
-            var action = undoStack.Pop();
-            action.Undo();
-            redoStack.Push(action);
+            if (undoStack.Count > 0)
+            {
+                IUndoableAction action = undoStack.Pop();
+                action.Undo();
+                redoStack.Push(action);
+            }
         }
 
+        /// <summary>
+        /// Повторяет последнее отменённое действие.
+        /// </summary>
         public void Redo()
         {
-            if (redoStack.Count <= 0) return;
-            
-            var action = redoStack.Pop();
-            action.Execute();
-            undoStack.Push(action);
+            if (redoStack.Count > 0)
+            {
+                IUndoableAction action = redoStack.Pop();
+                action.Execute();
+                undoStack.Push(action);
+            }
         }
     }
 }

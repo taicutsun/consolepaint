@@ -7,25 +7,19 @@ namespace ConsolePaint.Terminal
     {
         private readonly Canvas canvas;
         private readonly UndoManager undoManager;
-
         private readonly int canvasWidth;
         private readonly int canvasHeight;
-
         private int cursorX;
         private int cursorY;
-
         private Shape? selectedShape;
-
         private const int MenuLines = 8;
 
         public Terminal()
         {
             canvasWidth = Console.WindowWidth - 10;
             canvasHeight = Console.WindowHeight - 10;
-
             canvas = new Canvas(canvasWidth, canvasHeight);
             undoManager = new UndoManager();
-
             cursorX = 0;
             cursorY = 0;
         }
@@ -48,115 +42,125 @@ namespace ConsolePaint.Terminal
             {
                 ConsoleKeyInfo keyInfo = Console.ReadKey(true);
 
-                if (keyInfo.Key == ConsoleKey.Escape)
+                switch (keyInfo.Key)
                 {
-                    return;
-                }
-                else if (keyInfo.Key == ConsoleKey.Enter)
-                {
-                    if (selectedShape == null)
-                    {
-                        selectedShape = GetShapeAtCursor();
-                        PrintMessage(selectedShape is not null
-                            ? "You selected a figure. Press arrow to move it .X - delete. F - to fill.  Enter - unselect"
-                            : "No figure found");
-                    }
-                    else
-                    {
-                        selectedShape = null;
-                        PrintMessage("Unselected. Press arrow to move cursor");
-                    }
-                }
-                else if (keyInfo.Key == ConsoleKey.Z)
-                {
-                    undoManager.Undo();
-                }
-                else if (keyInfo.Key == ConsoleKey.Y)
-                {
-                    undoManager.Redo();
-                }
-                else if (keyInfo.Key == ConsoleKey.X)
-                {
-                    if (selectedShape != null)
-                    {
-                        var addAction = new RemoveShapeAction(canvas, selectedShape);
-                        undoManager.ExecuteAction(addAction);
-                        selectedShape = null;
-                        PrintMessage("Selected figure deleted.");
-                    }
-                    else
-                    {
-                        PrintMessage("No selected figure for deletion.");
-                    }
-                }
-                else if (keyInfo.Key == ConsoleKey.D)
-                {
-                    ShowAddShapeMenu();
-                }
-                else if (keyInfo.Key == ConsoleKey.F)
-                {
-                    if (selectedShape != null)
-                    {
-                        PrintMessage("Filling symbol (Enter = +):");
-                        string fillSym = ReadLineAt(canvasHeight + 5);
-                        char fillSymbol = string.IsNullOrEmpty(fillSym) ? '+' : fillSym[0];
+                    case ConsoleKey.Escape:
+                        return;
 
-                        PrintMessage("Filling color (exmpl: Blue, Enter = White):");
-                        string fillCol = ReadLineAt(canvasHeight + 5);
-                        ConsoleColor fillColor = Enum.TryParse(fillCol, true, out fillColor) ? fillColor : ConsoleColor.White;
+                    case ConsoleKey.Enter:
+                        if (selectedShape == null)
+                        {
+                            selectedShape = GetShapeAtCursor();
+                            PrintMessage(selectedShape is not null
+                                ? "Shape selected. Use arrow keys to move it. [X] - delete. [F] - fill. Press Enter to cancel selection."
+                                : "No shape found under the cursor.");
+                        }
+                        else
+                        {
+                            selectedShape = null;
+                            PrintMessage("Selection cleared. Arrow keys move the cursor.");
+                        }
+                        break;
 
-                        var fillAction = new FillShapeAction(canvas, selectedShape, fillSymbol, fillColor);
-                        undoManager.ExecuteAction(fillAction);
+                    case ConsoleKey.Z:
+                        undoManager.Undo();
+                        break;
 
-                        PrintMessage("Filled. Press 'Enter' 2 times.");
-                        ReadLineAt(canvasHeight + 5);
-                    }
-                    else
-                    {
-                        PrintMessage("No selected figure for filling.");
-                        ReadLineAt(canvasHeight + 5);
-                    }
-                }
-                else if (keyInfo.Key == ConsoleKey.S)
-                {
-                    SaveCanvas();
-                }
-                else if (keyInfo.Key == ConsoleKey.L)
-                {
-                    LoadCanvas();
-                }
-                else if (IsArrowKey(keyInfo.Key))
-                {
-                    int dx = 0, dy = 0;
-                    switch (keyInfo.Key)
-                    {
-                        case ConsoleKey.UpArrow: dy = -1; break;
-                        case ConsoleKey.DownArrow: dy = 1; break;
-                        case ConsoleKey.LeftArrow: dx = -1; break;
-                        case ConsoleKey.RightArrow: dx = 1; break;
-                    }
+                    case ConsoleKey.Y:
+                        undoManager.Redo();
+                        break;
 
-                    if (selectedShape != null)
-                    {
-                        var moveAction = new MoveShapeAction(canvas, selectedShape, dx, dy);
-                        undoManager.ExecuteAction(moveAction);
-                    }
-                    else
-                    {
-                        MoveCursor(dx, dy);
-                    }
+                    case ConsoleKey.X:
+                        if (selectedShape != null)
+                        {
+                            var removeAction = new RemoveShapeAction(canvas, selectedShape);
+                            undoManager.ExecuteAction(removeAction);
+                            selectedShape = null;
+                            PrintMessage("Selected shape deleted.");
+                        }
+                        else
+                        {
+                            PrintMessage("No shape selected for deletion.");
+                        }
+                        break;
+
+                    case ConsoleKey.D:
+                        ShowAddShapeMenu();
+                        break;
+
+                    case ConsoleKey.F:
+                        if (selectedShape != null)
+                        {
+                            PrintMessage("Enter fill symbol (Enter = +):");
+                            string fillSym = ReadLineAt(canvasHeight + 5);
+                            char fillSymbol = string.IsNullOrEmpty(fillSym) ? '+' : fillSym[0];
+
+                            PrintMessage("Enter fill color (e.g., Blue, Enter = White):");
+                            string fillCol = ReadLineAt(canvasHeight + 5);
+                            ConsoleColor fillColor = Enum.TryParse(fillCol, true, out fillColor) ? fillColor : ConsoleColor.White;
+
+                            var fillAction = new FillShapeAction(canvas, selectedShape, fillSymbol, fillColor);
+                            undoManager.ExecuteAction(fillAction);
+
+                            PrintMessage("Fill applied. Press Enter twice.");
+                            ReadLineAt(canvasHeight + 5);
+                        }
+                        else
+                        {
+                            PrintMessage("No shape selected for filling.");
+                            ReadLineAt(canvasHeight + 5);
+                        }
+                        break;
+
+                    case ConsoleKey.S:
+                        SaveCanvas();
+                        break;
+
+                    case ConsoleKey.L:
+                        LoadCanvas();
+                        break;
+
+                    default:
+                        if (IsArrowKey(keyInfo.Key))
+                        {
+                            int dx = 0, dy = 0;
+                            switch (keyInfo.Key)
+                            {
+                                case ConsoleKey.UpArrow:
+                                    dy = -1;
+                                    break;
+                                case ConsoleKey.DownArrow:
+                                    dy = 1;
+                                    break;
+                                case ConsoleKey.LeftArrow:
+                                    dx = -1;
+                                    break;
+                                case ConsoleKey.RightArrow:
+                                    dx = 1;
+                                    break;
+                            }
+
+                            if (selectedShape != null)
+                            {
+                                var moveAction = new MoveShapeAction(canvas, selectedShape, dx, dy);
+                                undoManager.ExecuteAction(moveAction);
+                            }
+                            else
+                            {
+                                MoveCursor(dx, dy);
+                            }
+                        }
+                        break;
                 }
             }
         }
-      
+
         private void ShowAddShapeMenu()
         {
-            // Снимаем выбор, чтобы стрелки не двигали выбранную фигуру
             selectedShape = null;
-
             ClearMenuArea();
-            PrintMessage("Add figure: [1] Line, [2] Dot, [3] Rectangle, [4] Triangle");
-            var choice = ReadLineAt(canvasHeight + 5);
+            PrintMessage("Add shape: [1] Line, [2] Point, [3] Rectangle, [4] Ellipse, [5] Triangle");
+            string choice = ReadLineAt(canvasHeight + 5);
             Shape s = null!;
             switch (choice)
             {
@@ -179,23 +183,40 @@ namespace ConsolePaint.Terminal
                     }
                     break;
                 case "4":
+                    if (PromptEllipseInput(out int ex, out int ey, out int exRadius, out int eyRadius, out char eSym, out ConsoleColor eColor))
+                    {
+                        s = ShapeFactory.CreateEllipse(ex, ey, exRadius, eyRadius, eSym, eColor);
+                    }
+                    break;
+                case "5":
                     if (PromptTriangleInput(out int tx1, out int ty1, out int tx2, out int ty2, out int tx3, out int ty3, out char tSym, out ConsoleColor tColor))
                     {
                         s = ShapeFactory.CreateTriangle(tx1, ty1, tx2, ty2, tx3, ty3, tSym, tColor);
                     }
                     break;
                 default:
-                    PrintMessage("Wrong answer. Press 'Enter' 2 times.");
+                    PrintMessage("Invalid choice. Press Enter twice.");
                     ReadLineAt(canvasHeight + 5);
                     break;
             }
 
+            if (s != null)
+            {
                 var addAction = new AddShapeAction(canvas, s);
                 undoManager.ExecuteAction(addAction);
+            }
 
             canvas.RedrawAllShapes();
             DrawMenu();
             DrawCursor();
+        }
+
+        private void DrawMenu()
+        {
+            int row = canvasHeight + 2;
+            ClearLine(row);
+            Console.SetCursorPosition(0, row);
+            Console.WriteLine("Menu: [D] - add shape, [S] - save, [L] - load, [Enter] - select/deselect, [Z]/[Y] - undo/redo, [Esc] - exit");
         }
 
         private Shape? GetShapeAtCursor()
@@ -217,15 +238,28 @@ namespace ConsolePaint.Terminal
                     key == ConsoleKey.RightArrow);
         }
 
-        private bool TryReadInt(out int result)
+        private void PrintMessage(string msg)
         {
-            FlushInput();
-            var row = canvasHeight + 5;
-            var input = ReadLineAt(row);
-            if (int.TryParse(input, out result)) return true;
-            PrintMessage("Error, must be an integer");
-            ReadLineAt(row);
-            return false;
+            int row = canvasHeight + 4;
+            ClearLine(row);
+            Console.SetCursorPosition(0, row);
+            Console.WriteLine(msg);
+        }
+
+        private void ClearMenuArea()
+        {
+            int startRow = canvasHeight + 2;
+            for (int i = 0; i < MenuLines; i++)
+            {
+                ClearLine(startRow + i);
+            }
+        }
+
+        private static void ClearLine(int row)
+        {
+            Console.SetCursorPosition(0, row);
+            Console.Write(new string(' ', 120));
+            Console.SetCursorPosition(0, row);
         }
 
         private static string ReadLineAt(int row)
@@ -243,31 +277,25 @@ namespace ConsolePaint.Terminal
                 Console.ReadKey(true);
             }
         }
-      
+
         private void DrawCursor()
         {
-            var drawX = cursorX + 1;
-            var drawY = cursorY + 1;
-
-            var prevLeft = Console.CursorLeft;
-            var prevTop = Console.CursorTop;
-
+            int drawX = cursorX + 1;
+            int drawY = cursorY + 1;
+            int prevLeft = Console.CursorLeft;
+            int prevTop = Console.CursorTop;
             Console.SetCursorPosition(drawX, drawY);
             Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.Write("_"); 
+            Console.Write("_");
             Console.ForegroundColor = ConsoleColor.White;
-
             Console.SetCursorPosition(prevLeft, prevTop);
         }
 
         private void MoveCursor(int dx, int dy)
         {
-           
             EraseCursor();
-
             cursorX = Math.Max(0, Math.Min(cursorX + dx, canvasWidth - 1));
             cursorY = Math.Max(0, Math.Min(cursorY + dy, canvasHeight - 1));
-
             DrawCursor();
         }
 
@@ -278,49 +306,6 @@ namespace ConsolePaint.Terminal
             Console.ForegroundColor = oldPixel.Color;
             Console.Write(oldPixel.Symbol);
             Console.ForegroundColor = ConsoleColor.White;
-        }
-        
-        private void SaveCanvas()
-        {
-            PrintMessage("Enter file name to save it (exmpl: canvas):");
-            var filename = ReadLineAt(canvasHeight + 5);
-            if (!filename.EndsWith(".json"))
-            {
-                filename += ".json";
-            } 
-            FileManager.SaveShapesToFile(canvas.Shapes, filename);
-            PrintMessage("Saved to " + filename + ". Press Enter.");
-            ReadLineAt(canvasHeight + 5);
-        }
-        private void LoadCanvas()
-        {
-            PrintMessage("Enter file name to load it:");
-            var filename = ReadLineAt(canvasHeight + 5);
-            LoadCanvas(filename);
-        }
-
-        private void LoadCanvas(string filename) 
-        {
-            if (!filename.EndsWith(".json")) 
-            {
-                filename += ".json";
-            }
-            var loadedShapes = FileManager.LoadShapesFromFile(filename);
-            if (loadedShapes.Count > 0)
-            {
-                foreach (var s in loadedShapes)
-                {
-                    canvas.AddShape(s);
-                }
-                canvas.RedrawAllShapes();
-                PrintMessage("Data loaded from " + filename + ". Press Enter.");
-                ReadLineAt(canvasHeight + 5);
-            }
-            else
-            {
-                PrintMessage("Error loading data from" + filename + ". Press Enter.");
-                ReadLineAt(canvasHeight + 5);
-            }
         }
     }
 }
