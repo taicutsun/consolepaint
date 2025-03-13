@@ -5,9 +5,6 @@ namespace ConsolePaint.Services
 {
     public static class FileManager
     {
-        /// <summary>
-        /// Сохраняет список фигур в файл JSON, используя обёртку для сохранения информации о типе.
-        /// </summary>
         public static void SaveShapesToFile(List<Shape> shapes, string filename)
         {
             ArgumentNullException.ThrowIfNull(shapes);
@@ -25,9 +22,9 @@ namespace ConsolePaint.Services
                 if (shape == null)
                     continue;
 
-                string typeName = shape.GetType().AssemblyQualifiedName ?? shape.GetType().FullName ?? "UnknownType";
+                var typeName = shape.GetType().AssemblyQualifiedName ?? shape.GetType().FullName ?? "UnknownType";
 
-                string shapeJson = JsonSerializer.Serialize(shape, shape.GetType(), options);
+                var shapeJson = JsonSerializer.Serialize(shape, shape.GetType(), options);
 
                 var wrapper = new ShapeWrapper
                 {
@@ -37,16 +34,12 @@ namespace ConsolePaint.Services
                 wrappers.Add(wrapper);
             }
 
-            string json = JsonSerializer.Serialize(wrappers, options);
+            var json = JsonSerializer.Serialize(wrappers, options);
             File.WriteAllText(filename, json);
         }
-
-        /// <summary>
-        /// Загружает список фигур из файла JSON, восстанавливая типы объектов.
-        /// </summary>
+        
         public static List<Shape> LoadShapesFromFile(string filename)
         {
-            // Если filename null или пуст, или файл не существует — возвращаем пустой список
             if (string.IsNullOrWhiteSpace(filename) || !File.Exists(filename))
             {
                 return [];
@@ -57,10 +50,9 @@ namespace ConsolePaint.Services
                 Converters = { new JsonStringEnumConverter() }
             };
 
-            string json = File.ReadAllText(filename);
+            var json = File.ReadAllText(filename);
 
-            // Десериализация может вернуть null, если JSON пуст или некорректен
-            List<ShapeWrapper>? wrappers = JsonSerializer.Deserialize<List<ShapeWrapper>>(json, options);
+            var wrappers = JsonSerializer.Deserialize<List<ShapeWrapper>>(json, options);
             if (wrappers == null)
             {
                 return [];
@@ -77,13 +69,13 @@ namespace ConsolePaint.Services
                     continue;
                 }
 
-                Type? type = Type.GetType(wrapper.Type);
+                var type = Type.GetType(wrapper.Type);
                 if (type == null)
                 {
                     continue;
                 }
 
-                object? deserialized = JsonSerializer.Deserialize(wrapper.Json, type, options);
+                var deserialized = JsonSerializer.Deserialize(wrapper.Json, type, options);
                 if (deserialized is Shape shape)
                 {
                     shapes.Add(shape);
@@ -92,9 +84,7 @@ namespace ConsolePaint.Services
             return shapes;
         }
     }
-    /// <summary>
-    /// Обёртка для сохранения информации о типе фигуры.
-    /// </summary>
+
     file class ShapeWrapper
     {
         public string Type { get; init; } = string.Empty;  //=>init

@@ -20,41 +20,40 @@ namespace ConsolePaint.Terminal
                 if (!TryReadIntInRange(out y, 0, canvasHeight - 1)) return false;
                 TempPointDraw(x, y, out tempPoint);
 
-                PrintMessage("Enter radius for X:");
+                PrintMessage("Enter radius along X:");
                 if (!TryReadIntInRange(out radiusX, 1, canvasWidth / 2 - 1)) return false;
-                int maxRadiusX = Math.Min(x, canvasWidth - 1 - x);
+                var maxRadiusX = Math.Min(x, canvasWidth - 1 - x);
                 if (radiusX < 1 || radiusX > maxRadiusX)
                 {
-                    PrintMessage($"X radius must be between 1 and {maxRadiusX}.");
+                    PrintMessage($"Radius along X must be between 1 and {maxRadiusX}.");
                     return false;
                 }
 
-                PrintMessage("Enter radius for Y:");
+                PrintMessage("Enter radius along Y:");
                 if (!TryReadIntInRange(out radiusY, 1, canvasHeight / 2 - 1)) return false;
-                int maxRadiusY = Math.Min(y, canvasHeight - 1 - y);
+                var maxRadiusY = Math.Min(y, canvasHeight - 1 - y);
                 if (radiusY < 1 || radiusY > maxRadiusY)
                 {
-                    PrintMessage($"Y radius must be between 1 and {maxRadiusY}.");
+                    PrintMessage($"Radius along Y must be between 1 and {maxRadiusY}.");
                     return false;
                 }
 
                 PrintMessage("Symbol for ellipse (Enter = *):");
-                string symInput = ReadLineAt(canvasHeight + 5);
+                var symInput = ReadLineAt(canvasHeight + 5);
                 if (!string.IsNullOrEmpty(symInput)) symbol = symInput[0];
 
                 PrintMessage("Color (Enter = White):");
-                string colInput = ReadLineAt(canvasHeight + 5);
-                if (!string.IsNullOrEmpty(colInput))
-                {
-                    if (!Enum.TryParse(colInput, true, out color))
-                        color = ConsoleColor.White;
-                }
+                var colInput = ReadLineAt(canvasHeight + 5);
+                
+                if (string.IsNullOrEmpty(colInput)) return true;
+                if (!Enum.TryParse(colInput, true, out color))
+                    color = ConsoleColor.White;
 
                 return true;
             }
             finally
             {
-                TempPointsRemove(new Shape[] { tempPoint });
+                TempPointsRemove(new[] { tempPoint });
             }
         }
 
@@ -67,44 +66,44 @@ namespace ConsolePaint.Terminal
             tempPoint1 = tempPoint2 = tempPoint3 = null!;
             try
             {
-                PrintMessage("Enter first vertex coordinate (X1):");
+                PrintMessage("Enter coordinates for the first vertex (X1):");
                 if (!TryReadIntInRange(out x1, 0, canvasWidth - 1)) return false;
-                PrintMessage("Enter first vertex coordinate (Y1):");
+                PrintMessage("Enter coordinates for the first vertex (Y1):");
                 if (!TryReadIntInRange(out y1, 0, canvasHeight - 1)) return false;
                 TempPointDraw(x1, y1, out tempPoint1);
 
-                PrintMessage("Enter second vertex coordinate (X2):");
+                PrintMessage("Enter coordinates for the second vertex (X2):");
                 if (!TryReadIntInRange(out x2, 0, canvasWidth - 1)) return false;
-                PrintMessage("Enter second vertex coordinate (Y2):");
+                PrintMessage("Enter coordinates for the second vertex (Y2):");
                 if (!TryReadIntInRange(out y2, 0, canvasHeight - 1)) return false;
                 TempPointDraw(x2, y2, out tempPoint2);
 
-                PrintMessage("Enter third vertex coordinate (X3):");
+                PrintMessage("Enter coordinates for the third vertex (X3):");
                 if (!TryReadIntInRange(out x3, 0, canvasWidth - 1)) return false;
-                PrintMessage("Enter third vertex coordinate (Y3):");
+                PrintMessage("Enter coordinates for the third vertex (Y3):");
                 if (!TryReadIntInRange(out y3, 0, canvasHeight - 1)) return false;
                 TempPointDraw(x3, y3, out tempPoint3);
 
                 PrintMessage("Symbol for triangle (Enter = *):");
-                string symInput = ReadLineAt(canvasHeight + 5);
+                var symInput = ReadLineAt(canvasHeight + 5);
                 if (!string.IsNullOrEmpty(symInput)) symbol = symInput[0];
 
                 PrintMessage("Color (Enter = White):");
-                string colInput = ReadLineAt(canvasHeight + 5);
-                if (!string.IsNullOrEmpty(colInput))
-                {
-                    if (!Enum.TryParse(colInput, true, out color))
-                        color = ConsoleColor.White;
-                }
+                var colInput = ReadLineAt(canvasHeight + 5);
+                
+                if (string.IsNullOrEmpty(colInput)) return true;
+                if (!Enum.TryParse(colInput, true, out color))
+                    color = ConsoleColor.White;
                 return true;
             }
             finally
             {
-                TempPointsRemove(new Shape[] { tempPoint1, tempPoint2, tempPoint3 });
+                TempPointsRemove(new[] { tempPoint1, tempPoint2, tempPoint3 });
             }
         }
 
-        private bool PromptLineInput(out int x1, out int y1, out int x2, out int y2, out char symbol, out ConsoleColor color)
+        private bool PromptLineInput(out int x1, out int y1, out int x2, out int y2,
+                               out char symbol, out ConsoleColor color)
         {
             Shape tempPoint1, tempPoint2;
             tempPoint1 = tempPoint2 = null!;
@@ -132,17 +131,16 @@ namespace ConsolePaint.Terminal
                 if (!string.IsNullOrEmpty(symInput)) symbol = symInput[0];
 
                 PrintMessage("Color (Enter = White):");
-                string colInput = ReadLineAt(canvasHeight + 5);
-                if (!string.IsNullOrEmpty(colInput))
-                {
-                    if (!Enum.TryParse(colInput, true, out color))
-                        color = ConsoleColor.White;
-                }
+                var colInput = ReadLineAt(canvasHeight + 5);
+                
+                if (string.IsNullOrEmpty(colInput)) return true;
+                if (!Enum.TryParse(colInput, true, out color))
+                    color = ConsoleColor.White;
                 return true;
             }
             finally
             {
-                TempPointsRemove(new Shape[] { tempPoint1, tempPoint2 });
+                TempPointsRemove(new[] { tempPoint1, tempPoint2 });
             }
         }
 
@@ -159,20 +157,20 @@ namespace ConsolePaint.Terminal
             if (!TryReadIntInRange(out y, 0, canvasHeight - 1)) return false;
 
             PrintMessage("Symbol for point (Enter = *):");
-            string symInput = ReadLineAt(canvasHeight + 5);
+            var symInput = ReadLineAt(canvasHeight + 5);
             if (!string.IsNullOrEmpty(symInput)) symbol = symInput[0];
 
             PrintMessage("Color (Enter = White):");
-            string colInput = ReadLineAt(canvasHeight + 5);
-            if (!string.IsNullOrEmpty(colInput))
-            {
-                if (!Enum.TryParse(colInput, true, out color))
-                    color = ConsoleColor.White;
-            }
+            var colInput = ReadLineAt(canvasHeight + 5);
+            
+            if (string.IsNullOrEmpty(colInput)) return true;
+            if (!Enum.TryParse(colInput, true, out color))
+                color = ConsoleColor.White;
             return true;
         }
 
-        private bool PromptRectangleInput(out int x1, out int y1, out int x2, out int y2, out char symbol, out ConsoleColor color)
+        private bool PromptRectangleInput(out int x1, out int y1, out int x2, out int y2,
+                                    out char symbol, out ConsoleColor color)
         {
             x1 = y1 = x2 = y2 = default;
             symbol = '#';
@@ -181,36 +179,35 @@ namespace ConsolePaint.Terminal
             tempPoint1 = tempPoint2 = null!;
             try
             {
-                PrintMessage("Enter X of first vertex:");
+                PrintMessage("Enter X of the first vertex:");
                 if (!TryReadIntInRange(out x1, 0, canvasWidth - 1)) return false;
 
-                PrintMessage("Enter Y of first vertex:");
+                PrintMessage("Enter Y of the first vertex:");
                 if (!TryReadIntInRange(out y1, 0, canvasHeight - 1)) return false;
                 TempPointDraw(x1, y1, out tempPoint1);
 
-                PrintMessage("Enter X of second vertex:");
+                PrintMessage("Enter X of the second vertex:");
                 if (!TryReadIntInRange(out x2, 0, canvasWidth - 1)) return false;
 
-                PrintMessage("Enter Y of second vertex:");
+                PrintMessage("Enter Y of the second vertex:");
                 if (!TryReadIntInRange(out y2, 0, canvasHeight - 1)) return false;
                 TempPointDraw(x2, y2, out tempPoint2);
 
                 PrintMessage("Symbol for rectangle (Enter = #):");
-                string symInput = ReadLineAt(canvasHeight + 5);
+                var symInput = ReadLineAt(canvasHeight + 5);
                 if (!string.IsNullOrEmpty(symInput)) symbol = symInput[0];
 
                 PrintMessage("Color (Enter = White):");
-                string colInput = ReadLineAt(canvasHeight + 5);
-                if (!string.IsNullOrEmpty(colInput))
-                {
-                    if (!Enum.TryParse(colInput, true, out color))
-                        color = ConsoleColor.White;
-                }
+                var colInput = ReadLineAt(canvasHeight + 5);
+                
+                if (string.IsNullOrEmpty(colInput)) return true;
+                if (!Enum.TryParse(colInput, true, out color))
+                    color = ConsoleColor.White;
                 return true;
             }
             finally
             {
-                TempPointsRemove(new Shape[] { tempPoint1, tempPoint2 });
+                TempPointsRemove(new[] { tempPoint1, tempPoint2 });
             }
         }
 
@@ -218,25 +215,21 @@ namespace ConsolePaint.Terminal
         {
             if (!TryReadInt(out result))
                 return false;
-            if (result < min || result > max)
-            {
-                PrintMessage($"Value must be between {min} and {max}.");
-                return false;
-            }
-            return true;
+            if (result >= min && result <= max) return true;
+            
+            PrintMessage($"Value must be between {min} and {max}.");
+            return false;
 
             bool TryReadInt(out int result)
             {
                 FlushInput();
-                int row = canvasHeight + 5;
-                string input = ReadLineAt(row);
-                if (!int.TryParse(input, out result))
-                {
-                    PrintMessage("Input error (not an integer)!");
-                    ReadLineAt(row);
-                    return false;
-                }
-                return true;
+                var row = canvasHeight + 5;
+                var input = ReadLineAt(row);
+                
+                if (int.TryParse(input, out result)) return true;
+                PrintMessage("Input error (not an integer)!");
+                ReadLineAt(row);  // Wait for Enter
+                return false;
             }
         }
 
@@ -257,7 +250,7 @@ namespace ConsolePaint.Terminal
         private void SaveCanvas()
         {
             PrintMessage("Enter file name for saving (e.g., canvas):");
-            string filename = ReadLineAt(canvasHeight + 5);
+            var filename = ReadLineAt(canvasHeight + 5);
             if (!filename.EndsWith(".json"))
             {
                 filename += ".json";
@@ -266,11 +259,11 @@ namespace ConsolePaint.Terminal
             PrintMessage("Canvas saved to " + filename + ". Press Enter.");
             ReadLineAt(canvasHeight + 5);
         }
-
+        
         private void LoadCanvas()
         {
             PrintMessage("Enter file name for loading (e.g., canvas):");
-            string filename = ReadLineAt(canvasHeight + 5);
+            var filename = ReadLineAt(canvasHeight + 5);
             LoadCanvas(filename);
         }
 
@@ -280,7 +273,7 @@ namespace ConsolePaint.Terminal
             {
                 filename += ".json";
             }
-            List<Shape> loadedShapes = FileManager.LoadShapesFromFile(filename);
+            var loadedShapes = FileManager.LoadShapesFromFile(filename);
             if (loadedShapes != null && loadedShapes.Count > 0)
             {
                 foreach (Shape s in loadedShapes)

@@ -1,9 +1,9 @@
 ﻿using ConsolePaint.Terminal;
 
-Terminal terminal = 
+var terminal = 
                     args.Length != 0 
-                    ? new(args[0]) 
-                    : new();
+                    ? new Terminal(args[0]) 
+                    : new Terminal();
 
 terminal.Run();
 

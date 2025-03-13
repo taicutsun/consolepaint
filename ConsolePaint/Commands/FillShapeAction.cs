@@ -16,8 +16,7 @@
             this.newColor = newColor;
             originalState = [];
 
-            // исходное состояние внутренних пикселей фигуры
-            for (int i = 0; i < shape.InnerPixels.Count; i++)
+            for (var i = 0; i < shape.InnerPixels.Count; i++)
             {
                 var p = shape.InnerPixels[i];
                 originalState.Add((i, p.Symbol, p.Color));
@@ -36,14 +35,12 @@
 
         public void Undo()
         {
-            // сохраненное состояние внутренних пикселей
             foreach (var (index, oldSymbol, oldColor) in originalState)
             {
-                if (index < shape.InnerPixels.Count)
-                {
-                    shape.InnerPixels[index].Symbol = oldSymbol;
-                    shape.InnerPixels[index].Color = oldColor;
-                }
+                if (index >= shape.InnerPixels.Count) continue;
+                
+                shape.InnerPixels[index].Symbol = oldSymbol;
+                shape.InnerPixels[index].Color = oldColor;
             }
             canvas.Fill(shape);
         }

@@ -7,19 +7,25 @@ namespace ConsolePaint.Terminal
     {
         private readonly Canvas canvas;
         private readonly UndoManager undoManager;
+
         private readonly int canvasWidth;
         private readonly int canvasHeight;
+
         private int cursorX;
         private int cursorY;
+
         private Shape? selectedShape;
+
         private const int MenuLines = 8;
 
         public Terminal()
         {
             canvasWidth = Console.WindowWidth - 10;
             canvasHeight = Console.WindowHeight - 10;
+
             canvas = new Canvas(canvasWidth, canvasHeight);
             undoManager = new UndoManager();
+
             cursorX = 0;
             cursorY = 0;
         }
@@ -40,11 +46,11 @@ namespace ConsolePaint.Terminal
 
             while (true)
             {
-                ConsoleKeyInfo keyInfo = Console.ReadKey(true);
+                var keyInfo = Console.ReadKey(true);
 
                 switch (keyInfo.Key)
                 {
-                    case ConsoleKey.Escape:
+                    case ConsoleKey.E:
                         return;
 
                     case ConsoleKey.Enter:
@@ -52,7 +58,7 @@ namespace ConsolePaint.Terminal
                         {
                             selectedShape = GetShapeAtCursor();
                             PrintMessage(selectedShape is not null
-                                ? "Shape selected. Use arrow keys to move it. [X] - delete. [F] - fill. Press Enter to cancel selection."
+                                ? "Shape selected. Use arrow keys to move it. [X] - delete. [F] - fill. Press Enter to deselect."
                                 : "No shape found under the cursor.");
                         }
                         else
@@ -91,11 +97,11 @@ namespace ConsolePaint.Terminal
                     case ConsoleKey.F:
                         if (selectedShape != null)
                         {
-                            PrintMessage("Enter fill symbol (Enter = +):");
+                            PrintMessage("Enter fill character (Press Enter for '+'):");
                             string fillSym = ReadLineAt(canvasHeight + 5);
                             char fillSymbol = string.IsNullOrEmpty(fillSym) ? '+' : fillSym[0];
 
-                            PrintMessage("Enter fill color (e.g., Blue, Enter = White):");
+                            PrintMessage("Enter fill color (e.g., Blue, Press Enter for White):");
                             string fillCol = ReadLineAt(canvasHeight + 5);
                             ConsoleColor fillColor = Enum.TryParse(fillCol, true, out fillColor) ? fillColor : ConsoleColor.White;
 
@@ -158,9 +164,10 @@ namespace ConsolePaint.Terminal
         private void ShowAddShapeMenu()
         {
             selectedShape = null;
+
             ClearMenuArea();
             PrintMessage("Add shape: [1] Line, [2] Point, [3] Rectangle, [4] Ellipse, [5] Triangle");
-            string choice = ReadLineAt(canvasHeight + 5);
+            var choice = ReadLineAt(canvasHeight + 5);
             Shape s = null!;
             switch (choice)
             {
@@ -195,7 +202,7 @@ namespace ConsolePaint.Terminal
                     }
                     break;
                 default:
-                    PrintMessage("Invalid choice. Press Enter twice.");
+                    PrintMessage("Invalid selection. Press Enter twice.");
                     ReadLineAt(canvasHeight + 5);
                     break;
             }
@@ -210,15 +217,15 @@ namespace ConsolePaint.Terminal
             DrawMenu();
             DrawCursor();
         }
-
+        
         private void DrawMenu()
         {
-            int row = canvasHeight + 2;
+            var row = canvasHeight + 2;
             ClearLine(row);
             Console.SetCursorPosition(0, row);
-            Console.WriteLine("Menu: [D] - add shape, [S] - save, [L] - load, [Enter] - select/deselect, [Z]/[Y] - undo/redo, [Esc] - exit");
+            Console.WriteLine("Menu: [D] - add shape, [S] - save, [L] - load, [Enter] - select/deselect, [Z]/[Y] - undo/redo, [E] - exit application");
         }
-
+        
         private Shape? GetShapeAtCursor()
         {
             var allShapes = canvas.Shapes;
@@ -229,7 +236,7 @@ namespace ConsolePaint.Terminal
             }
             return null;
         }
-
+        
         private static bool IsArrowKey(ConsoleKey key)
         {
             return (key == ConsoleKey.UpArrow ||
@@ -240,7 +247,7 @@ namespace ConsolePaint.Terminal
 
         private void PrintMessage(string msg)
         {
-            int row = canvasHeight + 4;
+            var row = canvasHeight + 4;
             ClearLine(row);
             Console.SetCursorPosition(0, row);
             Console.WriteLine(msg);
@@ -248,8 +255,8 @@ namespace ConsolePaint.Terminal
 
         private void ClearMenuArea()
         {
-            int startRow = canvasHeight + 2;
-            for (int i = 0; i < MenuLines; i++)
+            var startRow = canvasHeight + 2;
+            for (var i = 0; i < MenuLines; i++)
             {
                 ClearLine(startRow + i);
             }
@@ -258,7 +265,7 @@ namespace ConsolePaint.Terminal
         private static void ClearLine(int row)
         {
             Console.SetCursorPosition(0, row);
-            Console.Write(new string(' ', 120));
+            Console.Write(new string(' ', 120));   
             Console.SetCursorPosition(0, row);
         }
 
@@ -280,28 +287,33 @@ namespace ConsolePaint.Terminal
 
         private void DrawCursor()
         {
-            int drawX = cursorX + 1;
-            int drawY = cursorY + 1;
-            int prevLeft = Console.CursorLeft;
-            int prevTop = Console.CursorTop;
+            var drawX = cursorX + 1;
+            var drawY = cursorY + 1;
+
+            var prevLeft = Console.CursorLeft;
+            var prevTop = Console.CursorTop;
+
             Console.SetCursorPosition(drawX, drawY);
             Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.Write("_");
+            Console.Write("_");  
             Console.ForegroundColor = ConsoleColor.White;
+
             Console.SetCursorPosition(prevLeft, prevTop);
         }
 
         private void MoveCursor(int dx, int dy)
         {
             EraseCursor();
+
             cursorX = Math.Max(0, Math.Min(cursorX + dx, canvasWidth - 1));
             cursorY = Math.Max(0, Math.Min(cursorY + dy, canvasHeight - 1));
+
             DrawCursor();
         }
 
         private void EraseCursor()
         {
-            Pixel oldPixel = canvas.GetPixel(cursorX, cursorY);
+            var oldPixel = canvas.GetPixel(cursorX, cursorY);
             Console.SetCursorPosition(cursorX + 1, cursorY + 1);
             Console.ForegroundColor = oldPixel.Color;
             Console.Write(oldPixel.Symbol);

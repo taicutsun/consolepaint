@@ -28,41 +28,31 @@
             Symbol = symbol;
             Color = color;
         }
-
-
-        /// <summary>
-        /// Вычислить пиксели фигуры 
-        /// </summary>
+        
         protected abstract void CalculatePixels();
-
-        /// <summary>
-        /// Перемещает фигуру на (dx, dy)
-        /// </summary>
+        
         public virtual void Move(int dx, int dy)
         {
-            for (int i = 0; i < OuterPixels.Count; i++)
+            for (var i = 0; i < OuterPixels.Count; i++)
             {
                 OuterPixels[i].X += dx;
                 OuterPixels[i].Y += dy;
             }
-            for (int i = 0; i < InnerPixels.Count; i++)
+            for (var i = 0; i < InnerPixels.Count; i++)
             {
                 InnerPixels[i].X += dx;
                 InnerPixels[i].Y += dy;
             }
         }
-
-        /// <summary>
-        /// Проверяет, содержит ли фигура точку (x, y) в своих пикселях.
-        /// </summary>
+       
         public virtual bool ContainsPoint(int x, int y)
         {
-            foreach (Pixel p in OuterPixels)
+            foreach (var p in OuterPixels)
             {
                 if (p.X == x && p.Y == y)
                     return true;
             }
-            foreach (Pixel p in InnerPixels)
+            foreach (var p in InnerPixels)
             {
                 if (p.X == x && p.Y == y)
                     return true;
